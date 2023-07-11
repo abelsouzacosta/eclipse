@@ -1,27 +1,31 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import databaseConfig from './config/database.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { configValidationSchema } from './configValidationSchema';
-import { MongooseModule } from '@nestjs/mongoose';
+import { SeederService } from './seeder/seeder.service';
+import { User, UserSchema } from './seeder/user.model';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env'],
-      validationSchema: configValidationSchema,
+      load: [databaseConfig],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        uri: `mongodb://${config.get<string>(
-          'MONGO_USER',
-        )}:${config.get<string>('MONGO_PASS')}@mongo:27017`,
+      useFactory: async (configService: ConfigService) => ({
+        uri: `mongodb://${configService.get(
+          'database.host',
+        )}:${configService.get('database.port')}/${configService.get(
+          'database.database',
+        )}`,
       }),
     }),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SeederService],
 })
 export class AppModule {}

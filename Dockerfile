@@ -1,7 +1,8 @@
 FROM node:18.16.1 as Development
 
-WORKDIR /usr/src/app
-COPY --chown=node:node package*.json ./
-RUN npm ci
-COPY --chown=node:node . .
-USER node
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "run", "start:dev"]
