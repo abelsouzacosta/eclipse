@@ -51,6 +51,7 @@ export class SeederService {
     await this.coin_model.create(coins);
 
     const user_created = await this.user_model.findOne({});
+
     const ripple_id = await this.coin_model.findOne({
       token_symbol: 'xrp',
     });

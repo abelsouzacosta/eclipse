@@ -5,7 +5,10 @@ import databaseConfig from './config/database.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SeederService } from './seeder/seeder.service';
-import { User, UserSchema } from './seeder/user.model';
+import { User, UserSchema } from './seeder/models/user.model';
+import { Wallet, WalletSchema } from './seeder/models/wallet.model';
+import { Coin, CoinSchema } from './seeder/models/coin.model';
+import { OfferModule } from './offer/offer.module';
 
 @Module({
   imports: [
@@ -23,7 +26,12 @@ import { User, UserSchema } from './seeder/user.model';
         )}`,
       }),
     }),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Wallet.name, schema: WalletSchema },
+      { name: Coin.name, schema: CoinSchema },
+    ]),
+    OfferModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeederService],

@@ -8,9 +8,19 @@ services:
       - 3000:3000
     env_file:
       - .env
+    volumes:
+      - .:/app
     depends_on:
       - mongo
+      - watcher
   mongo:
     image: mongo
     ports:
       - 27017:27017
+  watcher:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    command: npm run dev
