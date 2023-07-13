@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Coin } from 'src/seeder/models/coin.model';
 import { PaginateOfferDto } from './dto/paginate-offer.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { isToday, parse, toDate } from 'date-fns';
+import { isToday, parse } from 'date-fns';
 
 @Injectable()
 export class OfferService {
