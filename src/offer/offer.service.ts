@@ -76,7 +76,7 @@ export class OfferService {
     );
   }
 
-  async create(data: CreateOfferDto): Promise<void> {
+  async create(data: CreateOfferDto): Promise<Offer> {
     await this.check_valid_coin(data.coin_id);
     await this.check_valid_wallet(data.wallet);
     await this.match_wallet_coin(data.wallet, data.coin_id);
@@ -89,9 +89,11 @@ export class OfferService {
       );
 
     this.logger.log(`Create new offer`);
-    await this.offer_model.create(data);
+    const new_offer = await this.offer_model.create(data);
     const new_amount = original_amount - data.units;
     await this.set_new_amount(data.coin_id, new_amount);
+
+    return new_offer;
   }
 
   async findAll(page: number, page_size: number): Promise<PaginateOfferDto> {
