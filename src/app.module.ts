@@ -9,6 +9,7 @@ import { User, UserSchema } from './seeder/models/user.model';
 import { Wallet, WalletSchema } from './seeder/models/wallet.model';
 import { Coin, CoinSchema } from './seeder/models/coin.model';
 import { OfferModule } from './offer/offer.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { OfferModule } from './offer/offer.module';
       { name: Coin.name, schema: CoinSchema },
     ]),
     OfferModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService, SeederService],

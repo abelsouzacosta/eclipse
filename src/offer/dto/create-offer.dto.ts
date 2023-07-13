@@ -34,4 +34,6 @@ export class CreateOfferDto {
     message: 'price_per_unit should be provided',
   })
   price_per_unit: number;
+
+  date: string;
 }

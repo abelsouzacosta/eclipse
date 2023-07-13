@@ -6,7 +6,6 @@ import { Offer, OfferSchema } from './entities/offer.entity';
 import { User, UserSchema } from 'src/seeder/models/user.model';
 import { Wallet, WalletSchema } from 'src/seeder/models/wallet.model';
 import { Coin, CoinSchema } from 'src/seeder/models/coin.model';
-
 @Module({
   imports: [
     MongooseModule.forFeature([

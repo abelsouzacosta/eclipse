@@ -24,6 +24,9 @@ export class Offer {
   @Prop({ required: true, type: Number })
   price_per_unit: number;
 
+  @Prop({ required: true, type: String })
+  date: string;
+
   @Prop({ required: true, default: true, type: Boolean })
   active: boolean;
 }
