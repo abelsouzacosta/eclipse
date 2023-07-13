@@ -25,24 +25,28 @@ export class SeederService {
     const user: User = {
       name: faker.person.fullName(),
       email: faker.internet.email(),
+      user_id: 300,
     };
 
     const bitcoin: Coin = {
       token_name: 'Bitcoin',
       token_symbol: 'btc',
       amount: 3,
+      coin_id: 200,
     };
 
     const ripple: Coin = {
       token_name: 'Ripple',
       token_symbol: 'xrp',
       amount: 300,
+      coin_id: 233,
     };
 
     const monero: Coin = {
       token_name: 'Monero',
       token_symbol: 'xmr',
       amount: 12,
+      coin_id: 232,
     };
 
     const coins = [bitcoin, ripple, monero];

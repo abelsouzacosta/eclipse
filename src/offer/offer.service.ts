@@ -8,6 +8,7 @@ import { Coin } from 'src/seeder/models/coin.model';
 import { PaginateOfferDto } from './dto/paginate-offer.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { isToday, parse } from 'date-fns';
+import { Wallet } from 'src/seeder/models/wallet.model';
 
 @Injectable()
 export class OfferService {
@@ -18,27 +19,79 @@ export class OfferService {
     private readonly offer_model: Model<Offer>,
     @InjectModel('Coin')
     private readonly coin_model: Model<Coin>,
+    @InjectModel('Wallet')
+    private readonly wallet_model: Model<Wallet>,
   ) {}
 
-  private async get_coin_amount(id: string): Promise<number> {
-    const coin = await this.coin_model.findOne({
-      _id: id,
+  async check_valid_coin(coin_id: number): Promise<void> {
+    const result = await this.coin_model.findOne({
+      coin_id,
     });
 
-    const amount = coin.amount;
-
-    return amount;
+    if (!result) {
+      this.logger.error(`Token not found ${coin_id}`);
+      throw new HttpException(
+        `Token ${coin_id} not found`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  async create(data: CreateOfferDto): Promise<Offer> {
-    const current_balance = await this.get_coin_amount(data.coin);
+  async check_valid_wallet(id: string): Promise<void> {
+    const result = await this.wallet_model.findById(id);
 
-    if (current_balance < data.units)
-      throw new HttpException('Insufficient Balance', HttpStatus.BAD_REQUEST);
+    if (!result)
+      throw new HttpException(
+        `Invalid wallet ${id} provided`,
+        HttpStatus.BAD_REQUEST,
+      );
+  }
 
-    const offer = await this.offer_model.create(data);
+  async match_wallet_coin(wallet_id: string, coin_id: number): Promise<void> {
+    const wallet = await this.wallet_model.findById(wallet_id);
+    const coins_ids = [];
 
-    return offer;
+    for (const coin of wallet.coins) {
+      coins_ids.push(coin.coin_id);
+    }
+
+    if (!coins_ids.includes(coin_id))
+      throw new HttpException('Invalid coin to wallet', HttpStatus.BAD_REQUEST);
+  }
+
+  async get_amount(coin_id: number): Promise<number> {
+    const result = await this.coin_model.findOne({ coin_id });
+
+    return result.amount;
+  }
+
+  async set_new_amount(coin_id: number, new_amount: number): Promise<void> {
+    await this.coin_model.updateOne(
+      {
+        coin_id,
+      },
+      {
+        $set: { amount: new_amount },
+      },
+    );
+  }
+
+  async create(data: CreateOfferDto): Promise<void> {
+    await this.check_valid_coin(data.coin_id);
+    await this.check_valid_wallet(data.wallet);
+    await this.match_wallet_coin(data.wallet, data.coin_id);
+    const original_amount = await this.get_amount(data.coin_id);
+
+    if (original_amount <= 0)
+      throw new HttpException(
+        'Impossible to create offer, insufficent funds',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    this.logger.log(`Create new offer`);
+    await this.offer_model.create(data);
+    const new_amount = original_amount - data.units;
+    await this.set_new_amount(data.coin_id, new_amount);
   }
 
   async findAll(page: number, page_size: number): Promise<PaginateOfferDto> {

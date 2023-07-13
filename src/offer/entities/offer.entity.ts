@@ -9,11 +9,11 @@ import { Wallet } from 'src/seeder/models/wallet.model';
   timestamps: true,
 })
 export class Offer {
-  @Prop({ required: true, type: mongoose.Types.ObjectId, ref: 'User' })
-  user: User;
+  @Prop({ required: true, type: Number, unique: false })
+  user_id: number;
 
-  @Prop({ required: true, type: mongoose.Types.ObjectId, ref: 'Coin' })
-  coin: Coin;
+  @Prop({ required: true, type: Number, unique: false })
+  coin_id: number;
 
   @Prop({ required: true, type: mongoose.Types.ObjectId, ref: 'Wallet' })
   wallet: Wallet;
